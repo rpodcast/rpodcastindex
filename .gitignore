@@ -4,3 +4,7 @@
 .RData
 .Ruserdata
 .DS_Store
+
+# project files
+data/*
+!data/README.md
