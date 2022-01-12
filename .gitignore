@@ -8,3 +8,4 @@
 # project files
 data/*
 !data/README.md
+.Renviron

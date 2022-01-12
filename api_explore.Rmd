@@ -1,0 +1,57 @@
+# Exploring the podcastindex API
+
+## Creating Headers source
+
+Links to review
+* https://github.com/SarvagyaVaish/python-podcastindex/blob/main/podcastindex/podcastindex.py
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(purrr)
+library(httr2)
+
+base_url <- "https://api.podcastindex.org/api/1.0"
+
+create_headers <- function(req, ...) {
+  user_agent <- "rpodcastindex/0.0.1"
+  current_time <- as.integer(Sys.time())
+
+  # create auth token based on API docs
+  auth_token <- openssl::sha1(
+    paste0(
+      Sys.getenv("PODCASTINDEX_API_KEY"),
+      Sys.getenv("PODCASTINDEX_API_SECRET"),
+      as.character(current_time)
+    )
+  )
+
+  httr2::req_headers(
+    req,
+    `User-Agent` = user_agent,
+    `X-Auth-Date` = as.character(current_time),
+    `X-Auth-Key` = Sys.getenv("PODCASTINDEX_API_KEY"),
+    Authorization = auth_token
+  )
+}
+
+
+```
+
+## Search
+
+### Search Podcasts
+
+```{r search-podcasts}
+search_term <- "batman university"
+
+req <- request(glue::glue("{base_url}/search/byterm"))
+
+resp <- req %>%
+  create_headers() %>%
+  req_url_query(q = search_term) %>%
+  req_perform()
+
+resp %>%
+  resp_body_json() %>%
+  str()
+```
